@@ -38,6 +38,7 @@ class Grid:
         self.dic = {(x, y): Cell(val=0, x=x, y=y) for x in range(width) for y in range(length)}
         self.view = [[self.dic[(x, y)] for x in range(width)] for y in range(length)]
         self._update_neighbors()
+        self.stale = False
 
     def __str__(self):
         return '\n'.join([''.join(['_' if cell.val == 0 else '#' for cell in row]) for row in self.view])
@@ -51,15 +52,19 @@ class Grid:
         self._update()
 
     def _update(self):
-        old = copy.deepcopy(self.dic)
-        for cell_xy, cell in old.items():
-            neighbors_sum = self._get_neighbors_sum(cell.neighbors)
-            if cell.is_alive:
-                if neighbors_sum not in (2, 3):
-                    self.dic[cell_xy].val = 0
-            else:
-                if neighbors_sum == 3:
-                    self.dic[cell_xy].val = 1
+        if not self.stale:
+            old = copy.deepcopy(self.dic)
+            for cell_xy, cell in old.items():
+                neighbors_sum = self._get_neighbors_sum(cell.neighbors)
+                if cell.is_alive:
+                    if neighbors_sum not in (2, 3):
+                        self.dic[cell_xy].val = 0
+                else:
+                    if neighbors_sum == 3:
+                        self.dic[cell_xy].val = 1
+
+            if old == self.dic:
+                self.stale = True
 
     def _get_neighbors_sum(self, neighbors):
         return sum((self.dic[n] for n in neighbors))
