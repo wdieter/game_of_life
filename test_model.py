@@ -29,10 +29,21 @@ neighbor_scenarios = [
 
 
 @pytest.mark.parametrize('x,y,width,length,expected', neighbor_scenarios)
-def test_get_all_neighbors_(x, y, width, length, expected):
+def test_get_all_neighbors(x, y, width, length, expected):
     ns = model.Grid._get_neighbors_list(x, y, width, length)
     print(ns)
     assert len(ns) == expected
+
+
+def test_update():
+    """ test update works as expected, cells not alive after one round"""
+    grid = model.Grid(5, 5)
+    cells = [(0, 0), (1, 0)]
+    grid.set_alive(cells)
+    grid.play()
+    for c in cells:
+        cell = grid.dic[c]
+        assert not cell.is_alive
 
 
 # Grid Tests
